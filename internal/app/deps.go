@@ -3,7 +3,7 @@ package app
 import (
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	"paribu_assignment/internal/config"
+	"paribu_assignment/config"
 	"paribu_assignment/internal/repository/messages"
 )
 

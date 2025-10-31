@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
+	"paribu_assignment/config"
 	"paribu_assignment/internal/app"
-	"paribu_assignment/internal/config"
 	"paribu_assignment/internal/storage"
 )
 

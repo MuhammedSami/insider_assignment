@@ -5,8 +5,8 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"paribu_assignment/config"
 	"paribu_assignment/internal/api"
-	"paribu_assignment/internal/config"
 )
 
 type APP struct {

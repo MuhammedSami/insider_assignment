@@ -17,12 +17,11 @@ restart:
 ps:
 	docker-compose ps
 
-
 build:
 	go build -o $(APP_NAME) ./...
 
 run:
-	go run ./...
+	go run ./cmd/...
 
 test:
 	@echo "Running tests..."

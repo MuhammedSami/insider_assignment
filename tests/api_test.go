@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"paribu_assignment/config"
 	"paribu_assignment/internal/api/models"
 	"paribu_assignment/internal/app"
-	"paribu_assignment/internal/config"
 	"paribu_assignment/internal/storage"
 	"testing"
 )

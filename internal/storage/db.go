@@ -5,7 +5,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
-	"paribu_assignment/internal/config"
+	"paribu_assignment/config"
 )
 
 func NewDb(cfg config.DBConn) *gorm.DB {
