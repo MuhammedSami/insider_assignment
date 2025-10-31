@@ -1,27 +1,30 @@
 package api
 
 import (
-	"database/sql"
+	"github.com/go-chi/chi/v5"
 	"github.com/redis/go-redis/v9"
 	"net/http"
 )
 
-type Handlers struct {
-	webhookClient WebhookClient
-	db            *sql.DB
-	redis         *redis.Client
+type Manager struct {
+	redis       *redis.Client
+	messageRepo repo
 }
 
-func NewHandlers(
-	db *sql.DB,
+func NewManager(
 	redis *redis.Client,
-) *Handlers {
-	return &Handlers{
-		db:    db,
-		redis: redis,
+	messageRepo repo,
+) *Manager {
+	return &Manager{
+		redis:       redis,
+		messageRepo: messageRepo,
 	}
 }
 
-func (a *Handlers) RegisterHandlers() {
-	http.HandleFunc("/weather", a.WeatherHandler)
+func (a *Manager) RegisterHandlers() http.Handler {
+	r := chi.NewRouter()
+
+	r.Get("/messages", a.GetMessages)
+
+	return r
 }

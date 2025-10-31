@@ -2,8 +2,7 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"paribu_assignment/internal/api"
+	"paribu_assignment/internal/app"
 	"paribu_assignment/internal/config"
 	"paribu_assignment/internal/storage"
 )
@@ -14,19 +13,12 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	db, err := storage.NewDb(cfg.DB)
-	if err != nil {
-		log.Fatalf("failed to connect DB: %v", err)
+	if err := cfg.Validate(); err != nil {
+		log.Fatalf("failed to validate config %w", err)
 	}
-	defer db.Close()
 
-	redisClient := storage.GetRedisClient(cfg.Redis)
+	db := storage.NewDb(cfg.DB)
 
-	a := api.NewHandlers(db, redisClient)
-	a.RegisterHandlers()
-
-	err = http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatalf("failed to serve http err: %+v", err)
-	}
+	a := app.NewApp(db, cfg)
+	a.Expose()
 }

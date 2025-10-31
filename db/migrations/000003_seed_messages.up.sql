@@ -1,0 +1,22 @@
+INSERT INTO messages (content, recipient_phone_number, status)
+VALUES
+    ('Welcome to the service!', '+905551111111', 'pending'),
+    ('Your verification code is 4921', '+905552222222', 'pending'),
+    ('Reminder: Your appointment is tomorrow.', '+905553333333', 'pending'),
+    ('Your package is on the way.', '+905554444444', 'pending'),
+    ('Promo: 10% off this weekend!', '+905555555555', 'pending'),
+    ('Hello from our Go service.', '+905556666666', 'pending'),
+    ('Please confirm your email address.', '+905557777777', 'pending'),
+    ('Your balance is low, please top up.', '+905558888888', 'pending'),
+    ('Survey: How was your experience?', '+905559999999', 'pending'),
+    ('Reset your password using this link.', '+905551010101', 'pending'),
+    ('Daily tip: Stay hydrated!', '+905552020202', 'pending'),
+    ('System update scheduled tonight.', '+905553030303', 'pending'),
+    ('Check out our new features.', '+905554040404', 'pending'),
+    ('Reminder: Subscription renewal due.', '+905555050505', 'pending'),
+    ('Your invoice is ready.', '+905556060606', 'pending'),
+    ('Security alert: New login detected.', '+905557070707', 'pending'),
+    ('Happy Friday! Enjoy your weekend.', '+905558080808', 'pending'),
+    ('We miss you! Come back for a bonus.', '+905559090909', 'pending'),
+    ('Refer a friend and earn rewards.', '+905551212121', 'pending'),
+    ('This is a test message from the system.', '+905552323232', 'pending');

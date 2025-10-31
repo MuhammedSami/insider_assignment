@@ -1,27 +1,25 @@
 package storage
 
 import (
-	"database/sql"
 	"fmt"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	"paribu_assignment/internal/config"
 )
 
-func NewDb(cfg config.DBConn) (*sql.DB, error) {
+func NewDb(cfg config.DBConn) *gorm.DB {
 	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName,
+		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
+		cfg.Host, cfg.User, cfg.Password, cfg.DBName, cfg.Port,
 	)
 
-	db, err := sql.Open("pgx", dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
+	log.Println("PostgreSQL connection succeeded via GORM")
 
-	log.Println("Connected to PostgreSQL successfully")
-	return db, nil
+	return db
 }

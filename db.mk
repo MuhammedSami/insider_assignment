@@ -5,7 +5,10 @@ migrate:
 	migrate -path db/migrations -database "$(DB_URL)" up
 
 migrate-down:
-	migrate -path db/migrations -database "$(DB_URL)" down 1
+	migrate -path db/migrations -database "$(DB_URL)" down
+
+migrate-version:
+	migrate -path db/migrations -database "$(DB_URL)" version
 
 migrate-create:
 	@if [ -z "$(name)" ]; then \

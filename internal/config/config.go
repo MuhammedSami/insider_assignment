@@ -25,7 +25,12 @@ type RedisConn struct {
 	Port     int
 	Password string
 }
+
+type API struct {
+	Port int
+}
 type Config struct {
+	Api     API
 	Message Message
 	DB      DBConn
 	Redis   RedisConn
@@ -58,8 +63,9 @@ func NewConfig() (*Config, error) {
 			SendInterval: *interval,
 		},
 		DB: DBConn{
-			Host:     "",
+			Host:     "localhost",
 			User:     "appuser",
+			Port:     5432,
 			Password: *dbPassword,
 			DBName:   "appdb",
 		},
@@ -68,10 +74,9 @@ func NewConfig() (*Config, error) {
 			Port:     6397,
 			Password: *redisPassword,
 		},
-	}
-
-	if err := cfg.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate config")
+		Api: API{
+			Port: 8080,
+		},
 	}
 
 	return &cfg, nil
