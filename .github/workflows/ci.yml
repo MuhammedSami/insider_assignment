@@ -39,6 +39,11 @@ jobs:
           curl -L https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz | tar xvz
           sudo mv migrate /usr/local/bin/
 
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
       - name: Run migrations
         run: make migrate
 
