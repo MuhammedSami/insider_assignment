@@ -1,0 +1,50 @@
+name: Message Processor - Checks
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+jobs:
+  ci:
+    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Start required services (Docker Compose)
+        run: make up
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for PostgreSQL and Redis to be ready..."
+          sleep 10
+
+      - name: Run migrations
+        env:
+          DB_URL: postgres://appuser:secret@localhost:5432/appdb?sslmode=disable
+        run: make migrate
+
+      - name: Run lint
+        run: make lint
+
+      - name: Run tests
+        run: make test
+
+      - name: Stop and clean up
+        if: always()
+        run: make down
