@@ -33,7 +33,7 @@ Example with custom message sending interval:
 
 go run ./cmd/... --password=secret --interval=10s
 
-I have used 10s for quick follow instead of 2 minutes
+10s is used for quick follow instead of 2 minutes
 
 ### Swagger UI
 
