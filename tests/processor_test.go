@@ -4,6 +4,7 @@ import (
 	"assignment/config"
 	"assignment/internal/app"
 	"assignment/internal/storage"
+	"context"
 	"fmt"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -17,7 +18,7 @@ func TestProcessor(t *testing.T) {
 
 	db := storage.NewDb(cfg.DB)
 
-	a := app.NewApp(db, cfg)
+	a := app.NewApp(context.Background(), db, cfg)
 
 	fmt.Println(a)
 

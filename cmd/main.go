@@ -4,6 +4,7 @@ import (
 	"assignment/config"
 	"assignment/internal/app"
 	"assignment/internal/storage"
+	"context"
 	"log"
 )
 
@@ -17,8 +18,13 @@ func main() {
 		log.Fatalf("failed to validate config %-+v", err)
 	}
 
+	ctx := context.Background()
+
 	db := storage.NewDb(cfg.DB)
 
-	a := app.NewApp(db, cfg)
-	a.Expose()
+	a := app.NewApp(ctx, db, cfg)
+
+	if err := a.ExposeWithGracefulShutDown(ctx); err != nil {
+		log.Fatalf("server exited with error: %v", err)
+	}
 }

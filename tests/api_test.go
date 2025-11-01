@@ -4,6 +4,7 @@ import (
 	"assignment/config"
 	"assignment/internal/app"
 	"assignment/internal/storage"
+	"context"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
@@ -19,7 +20,7 @@ func TestAPIEndpoints(t *testing.T) {
 
 	cfg.DB.Password = "secret"
 	db := storage.NewDb(cfg.DB)
-	a := app.NewApp(db, cfg)
+	a := app.NewApp(context.Background(), db, cfg)
 
 	ts := httptest.NewServer(a.API.RegisterHandlers())
 	defer ts.Close()

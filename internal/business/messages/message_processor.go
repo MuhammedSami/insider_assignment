@@ -12,8 +12,13 @@ import (
 	"time"
 )
 
+type MessageCache struct {
+	MessageID string    `json:"message_id"`
+	SentAt    time.Time `json:"sent_at"`
+}
+
 type Processor interface {
-	Send(payload messageProcessor.MessagePayload) (bool, error)
+	Send(ctx context.Context, payload messageProcessor.MessagePayload) (bool, error)
 }
 
 type AutoMessageProcessor struct {
@@ -65,6 +70,7 @@ func (p *AutoMessageProcessor) Process(ctx context.Context) error {
 
 // what happens if this pod is at scale and we read from same database ?
 // lets imagine someone entered 10s and 1000 per 10s what happens,
+// what happens on stop called ? context is cancelled and how about the number of messages retrieved ?
 // I would definetly use a worker pool based on  but for now I think it is enough to have this simple code...
 func (p *AutoMessageProcessor) processInBatch(ctx context.Context, batchCount int) {
 	msgs, err := p.repo.GetMessagesByStatuses(
@@ -87,7 +93,7 @@ func (p *AutoMessageProcessor) processInBatch(ctx context.Context, batchCount in
 			continue
 		}
 
-		sent, err := p.processor.Send(messageProcessor.MessagePayload{
+		sent, err := p.processor.Send(ctx, messageProcessor.MessagePayload{
 			To:      message.RecipientPhoneNumber,
 			Content: message.Content,
 		})
@@ -110,11 +116,6 @@ func (p *AutoMessageProcessor) processInBatch(ctx context.Context, batchCount in
 }
 
 func (p *AutoMessageProcessor) cacheMessageInfo(ctx context.Context, messageID string) {
-	type MessageCache struct {
-		MessageID string    `json:"message_id"`
-		SentAt    time.Time `json:"sent_at"`
-	}
-
 	cacheData := MessageCache{
 		MessageID: messageID,
 		SentAt:    time.Now().UTC(),
@@ -122,7 +123,7 @@ func (p *AutoMessageProcessor) cacheMessageInfo(ctx context.Context, messageID s
 
 	data, _ := json.Marshal(cacheData)
 
-	ttl := 2 * time.Hour
+	ttl := 2 * time.Hour // not aware of TTL using a fixed one but might come from config as well
 	key := fmt.Sprintf("message:%s", messageID)
 
 	log.Info("caching id: ", messageID)
