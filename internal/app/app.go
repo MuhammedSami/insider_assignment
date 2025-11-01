@@ -26,11 +26,6 @@ func NewApp(db *gorm.DB, cfg *config.Config) *APP {
 	messageRepo := app.GetMessagesRepo()
 	redisClient := app.GetRedisClient(cfg.Redis)
 
-	app.API = *api.NewManager(
-		redisClient,
-		messageRepo,
-	)
-
 	ctx, cancel := context.WithCancel(context.Background())
 
 	autoMessageProcessor := messages.NewAuthMessageProcessor(
@@ -38,6 +33,12 @@ func NewApp(db *gorm.DB, cfg *config.Config) *APP {
 		messageRepo,
 		app.GetMessageProcessor(),
 		redisClient,
+	)
+
+	app.API = *api.NewManager(
+		redisClient,
+		messageRepo,
+		autoMessageProcessor,
 	)
 
 	err := autoMessageProcessor.Process(ctx)

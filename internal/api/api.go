@@ -10,6 +10,7 @@ import (
 type Manager struct {
 	redis                 *redis.Client
 	messageRepo           repo
+	AutoMessageProcessor  autoMessageProcessor
 	AutoProcessorCancelFn context.CancelFunc
 	AutoProcessorRunning  bool
 }
@@ -17,10 +18,12 @@ type Manager struct {
 func NewManager(
 	redis *redis.Client,
 	messageRepo repo,
+	autoMessageProcessor autoMessageProcessor,
 ) *Manager {
 	return &Manager{
-		redis:       redis,
-		messageRepo: messageRepo,
+		redis:                redis,
+		messageRepo:          messageRepo,
+		AutoMessageProcessor: autoMessageProcessor,
 	}
 }
 
@@ -28,8 +31,8 @@ func (a *Manager) RegisterHandlers() http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/messages/sent", a.GetMessages)
-	r.Post("/processor/start", a.StartStopProcessor)
-	r.Post("/processor/stop", a.StartStopProcessor)
+	r.Post("/processor/start", a.StartProcessor)
+	r.Post("/processor/stop", a.StopProcessor)
 
 	return r
 }

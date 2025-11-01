@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: Auto Message Processor API
+  version: 1.0.0
+  description: API to manage automatic message sending and retrieve sent messages.
+
+paths:
+  /messages/sent:
+    get:
+      summary: Retrieve a list of sent messages
+      description: Returns messages with status `sent`.
+      tags:
+        - Messages
+      responses:
+        '200':
+          description: List of sent messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: Number of messages returned
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        content:
+                          type: string
+                        recipientPhoneNumber:
+                          type: string
+                        status:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /processor/start:
+    post:
+      summary: Start automatic message sending
+      tags:
+        - Processor
+      responses:
+        '200':
+          description: Processor started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: processor started
+        '409':
+          description: Processor is already running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: processor already running
+        '500':
+          description: Failed to start processor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: failed to start processor
+
+  /processor/stop:
+    post:
+      summary: Stop automatic message sending
+      tags:
+        - Processor
+      responses:
+        '200':
+          description: Processor stopped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: processor stopped
+        '409':
+          description: Processor not running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: processor not running

@@ -3,6 +3,7 @@ package api
 import (
 	apiModels "assignment/internal/api/models"
 	repoModels "assignment/internal/repository/models"
+	"context"
 	"encoding/json"
 	"net/http"
 )
@@ -21,6 +22,7 @@ func (a *Manager) GetMessages(w http.ResponseWriter, r *http.Request) {
 	var apiMessages []apiModels.Message
 
 	for _, m := range messages {
+		// we dont return failedCount bec it is not relevant
 		apiMessages = append(apiMessages, apiModels.Message{
 			Id:                   m.UUID.String(),
 			Content:              m.Content,
@@ -38,10 +40,42 @@ func (a *Manager) GetMessages(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func (a *Manager) StartStopProcessor(w http.ResponseWriter, r *http.Request) {
+func (a *Manager) StartProcessor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if a.AutoProcessorRunning {
-		a.AutoProcessorCancelFn()
+		w.WriteHeader(http.StatusConflict)
+		w.Write([]byte(`{"message":processor already running"}`))
+		return
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	a.AutoProcessorCancelFn = cancel
+	a.AutoProcessorRunning = true
+
+	err := a.AutoMessageProcessor.Process(ctx)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message":"failed to start processor"}`))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message":"processor started"}`))
+}
+
+func (a *Manager) StopProcessor(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if !a.AutoProcessorRunning {
+		w.WriteHeader(http.StatusConflict) // we could return 200 as well it makes sense but I think it depends on who is using this API
+		w.Write([]byte(`{"message":"processor not running"}`))
+		return
+	}
+
+	a.AutoProcessorCancelFn()
+	a.AutoProcessorRunning = false
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message":"processor stopped"}`))
 }

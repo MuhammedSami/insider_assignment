@@ -55,7 +55,7 @@ func (p *AutoMessageProcessor) Process(ctx context.Context) error {
 				return
 			case t := <-ticker.C:
 				fmt.Println("Processing next batch at :", t)
-				p.ProcessInBatch(ctx, p.cfg.Message.BatchProcessCount)
+				p.processInBatch(ctx, p.cfg.Message.BatchProcessCount)
 			}
 		}
 	}()
@@ -65,8 +65,8 @@ func (p *AutoMessageProcessor) Process(ctx context.Context) error {
 
 // what happens if this pod is at scale and we read from same database ?
 // lets imagine someone entered 10s and 1000 per 10s what happens,
-// I would definetly use a worker pool but for now I think it is enough to have this simple code...
-func (p *AutoMessageProcessor) ProcessInBatch(ctx context.Context, batchCount int) {
+// I would definetly use a worker pool based on  but for now I think it is enough to have this simple code...
+func (p *AutoMessageProcessor) processInBatch(ctx context.Context, batchCount int) {
 	msgs, err := p.repo.GetMessagesByStatuses(
 		batchCount,
 		[]models.MessageStatus{models.StatusPending, models.StatusFailed},
@@ -102,14 +102,14 @@ func (p *AutoMessageProcessor) ProcessInBatch(ctx context.Context, batchCount in
 
 		if sent {
 			p.repo.UpdateStatus(messageId, models.StatusSent)
-			p.CacheMessageInfo(ctx, messageId)
+			p.cacheMessageInfo(ctx, messageId)
 		}
 
 		log.Info("sent!")
 	}
 }
 
-func (p *AutoMessageProcessor) CacheMessageInfo(ctx context.Context, messageID string) {
+func (p *AutoMessageProcessor) cacheMessageInfo(ctx context.Context, messageID string) {
 	type MessageCache struct {
 		MessageID string    `json:"message_id"`
 		SentAt    time.Time `json:"sent_at"`

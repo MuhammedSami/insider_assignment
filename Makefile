@@ -20,8 +20,8 @@ ps:
 build:
 	go build -o $(APP_NAME) ./...
 
-run:
-	go run ./cmd/... --password=secret
+run: up
+	go run ./cmd/... --password=secret --interval=10s
 
 test:
 	@echo "Running tests..."
@@ -29,3 +29,6 @@ test:
 
 lint:
 	golangci-lint run ./...
+
+swagger-ui:
+	docker run --rm -p 8090:8080 -v `pwd`/docs:/usr/share/nginx/html/docs -e URL=/docs/swagger.yaml swaggerapi/swagger-ui
