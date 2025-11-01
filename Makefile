@@ -1,8 +1,8 @@
 include db.mk
 
-APP_NAME := mailAPP
+APP_NAME := MessageProcessorService
 
-.PHONY: up down restart logs ps migrate build run test lint
+.PHONY: up down restart logs ps build run test lint
 
 up:
 	docker compose up -d

@@ -34,9 +34,12 @@ jobs:
           echo "Waiting for PostgreSQL and Redis to be ready..."
           sleep 10
 
+      - name: Install migrate CLI
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz | tar xvz
+          sudo mv migrate /usr/local/bin/
+
       - name: Run migrations
-        env:
-          DB_URL: postgres://appuser:secret@localhost:5432/appdb?sslmode=disable
         run: make migrate
 
       - name: Run lint
@@ -46,5 +49,4 @@ jobs:
         run: make test
 
       - name: Stop and clean up
-        if: always()
         run: make down
