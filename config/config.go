@@ -90,7 +90,7 @@ func NewConfig() (*Config, error) {
 		},
 		MessageProcessor: MessageProcessorAPI{
 			Host:  "https://webhook.site",
-			Token: "2689d6cb-ff1f-4b51-8ec5-b159b556b321",
+			Token: "75e83016-f99f-46ad-b833-8915a9abd327", // use this if you get 429 378d51ae-3661-4491-bc37-8da6434eb8c2, you need to chang
 		},
 	}
 
