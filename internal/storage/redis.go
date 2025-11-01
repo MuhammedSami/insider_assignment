@@ -1,9 +1,9 @@
 package storage
 
 import (
+	"assignment/config"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	"paribu_assignment/config"
 )
 
 func GetRedisClient(cfg config.RedisConn) *redis.Client {

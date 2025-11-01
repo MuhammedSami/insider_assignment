@@ -1,15 +1,15 @@
 package tests
 
 import (
+	"assignment/config"
+	"assignment/internal/api/models"
+	"assignment/internal/app"
+	"assignment/internal/storage"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"paribu_assignment/config"
-	"paribu_assignment/internal/api/models"
-	"paribu_assignment/internal/app"
-	"paribu_assignment/internal/storage"
 	"testing"
 )
 
@@ -32,10 +32,10 @@ func TestGetMessages(t *testing.T) {
 		t.Error(err)
 	}
 
-	weather := &models.MessageResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(weather); err != nil {
+	message := &models.MessageResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(message); err != nil {
 		t.Error(err)
 	}
 
-	fmt.Println(weather)
+	fmt.Println(message)
 }

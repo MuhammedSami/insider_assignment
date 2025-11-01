@@ -1,11 +1,11 @@
 package storage
 
 import (
+	"assignment/config"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
-	"paribu_assignment/config"
 )
 
 func NewDb(cfg config.DBConn) *gorm.DB {

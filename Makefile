@@ -21,7 +21,7 @@ build:
 	go build -o $(APP_NAME) ./...
 
 run:
-	go run ./cmd/...
+	go run ./cmd/... --password=secret
 
 test:
 	@echo "Running tests..."

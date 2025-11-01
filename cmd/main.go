@@ -1,10 +1,10 @@
 package main
 
 import (
+	"assignment/config"
+	"assignment/internal/app"
+	"assignment/internal/storage"
 	"log"
-	"paribu_assignment/config"
-	"paribu_assignment/internal/app"
-	"paribu_assignment/internal/storage"
 )
 
 func main() {

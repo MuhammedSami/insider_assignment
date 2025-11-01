@@ -6,10 +6,17 @@ import (
 	"time"
 )
 
+type MessageProcessorAPI struct {
+	Host  string
+	Token string
+}
+
 type Message struct {
-	Retry        bool
-	Timeout      time.Duration
-	SendInterval time.Duration
+	Retry             bool
+	Timeout           time.Duration
+	SendInterval      time.Duration
+	BatchProcessCount int
+	RetryFailCount    int
 }
 
 type DBConn struct {
@@ -30,10 +37,11 @@ type API struct {
 	Port int
 }
 type Config struct {
-	Api     API
-	Message Message
-	DB      DBConn
-	Redis   RedisConn
+	Api              API
+	Message          Message
+	DB               DBConn
+	Redis            RedisConn
+	MessageProcessor MessageProcessorAPI
 }
 
 // use this if config needs any other validation
@@ -50,17 +58,20 @@ func NewConfig() (*Config, error) {
 
 	retry := flag.Bool("retry", false, "Enable retry for failed messages")
 	timeout := flag.Duration("timeout", 5*time.Second, "Timeout for each message send attempt")
-	interval := flag.Duration("interval", 2*time.Minute, "Interval between message sends")
+	interval := flag.Duration("interval", 2*time.Minute, "Interval between message sends") // put: 30s, 1m, 2m30s
 	dbPassword := flag.String("password", "", "Password for db connection")
 	redisPassword := flag.String("redis-password", "", "Password for redis db connection")
+	batchProcessCount := flag.Int("message-process-count", 2, "Password for redis db connection")
 
 	flag.Parse()
 
 	cfg := Config{
 		Message: Message{
-			Retry:        *retry,
-			Timeout:      *timeout,
-			SendInterval: *interval,
+			Retry:             *retry,
+			Timeout:           *timeout,
+			SendInterval:      *interval,
+			BatchProcessCount: *batchProcessCount,
+			RetryFailCount:    2, // keep it as 2 for now
 		},
 		DB: DBConn{
 			Host:     "localhost",
@@ -71,11 +82,15 @@ func NewConfig() (*Config, error) {
 		},
 		Redis: RedisConn{
 			Host:     "localhost",
-			Port:     6397,
+			Port:     6379,
 			Password: *redisPassword,
 		},
 		Api: API{
 			Port: 8080,
+		},
+		MessageProcessor: MessageProcessorAPI{
+			Host:  "https://webhook.site",
+			Token: "2689d6cb-ff1f-4b51-8ec5-b159b556b321",
 		},
 	}
 

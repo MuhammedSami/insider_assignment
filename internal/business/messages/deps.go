@@ -1,4 +1,4 @@
-package api
+package messages
 
 import (
 	repoModels "assignment/internal/repository/models"
@@ -6,4 +6,6 @@ import (
 
 type repo interface {
 	GetMessagesByStatuses(limit int, statuses []repoModels.MessageStatus) ([]repoModels.Message, error)
+	UpdateStatus(uuid string, status repoModels.MessageStatus) bool
+	MessageToRetry(uuid string, maxFailCount int) bool
 }
