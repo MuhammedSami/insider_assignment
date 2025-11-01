@@ -46,6 +46,13 @@ make swagger-ui
 ## DB SCHEMA
 
 ````
+CREATE TYPE message_status AS ENUM (
+    'pending',
+    'sent',
+    'failed',
+    'permanent_fail'
+);
+
 create table messages
 (
     uuid                   uuid           default gen_random_uuid()         not null
