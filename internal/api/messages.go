@@ -1,3 +1,4 @@
+//nolint:errcheck
 package api
 
 import (
@@ -37,7 +38,13 @@ func (a *Manager) GetMessages(w http.ResponseWriter, r *http.Request) {
 		Messages: apiMessages,
 	}
 
-	json.NewEncoder(w).Encode(resp)
+	err = json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message":"failed to encode response"}`))
+
+		return
+	}
 }
 
 func (a *Manager) StartProcessor(w http.ResponseWriter, r *http.Request) {

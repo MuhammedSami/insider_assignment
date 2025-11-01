@@ -34,7 +34,7 @@ func (p *Processor) Send(payload MessagePayload) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("failed to send message: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusAccepted {
 		return false, fmt.Errorf("unexpected status code: %d", resp.StatusCode)

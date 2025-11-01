@@ -14,7 +14,7 @@ func main() {
 	}
 
 	if err := cfg.Validate(); err != nil {
-		log.Fatalf("failed to validate config %w", err)
+		log.Fatalf("failed to validate config %-+v", err)
 	}
 
 	db := storage.NewDb(cfg.DB)

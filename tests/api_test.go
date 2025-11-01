@@ -83,7 +83,7 @@ func TestAPIEndpoints(t *testing.T) {
 			if err != nil {
 				t.Fatalf("request failed: %v", err)
 			}
-			defer resp.Body.Close()
+			defer resp.Body.Close() //nolint:errcheck
 
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 		})
