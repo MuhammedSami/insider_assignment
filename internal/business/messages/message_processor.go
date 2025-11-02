@@ -69,9 +69,9 @@ func (p *AutoMessageProcessor) Process(ctx context.Context) error {
 }
 
 // what happens if this pod is at scale and we read from same database ?
-// lets imagine someone entered 10s and 1000 per 10s what happens,
+// lets imagine someone entered 10s and 1000 per 10s what happens ?
 // what happens on stop called ? context is cancelled and how about the number of messages retrieved ?
-// I would definetly use a worker pool based on  but for now I think it is enough to have this simple code...
+// I would definetly use a worker pool but for now I think it is enough to have this simple code...
 func (p *AutoMessageProcessor) processInBatch(ctx context.Context, batchCount int) {
 	msgs, err := p.repo.GetMessagesByStatuses(
 		batchCount,
@@ -126,7 +126,7 @@ func (p *AutoMessageProcessor) cacheMessageInfo(ctx context.Context, messageID s
 	ttl := 2 * time.Hour // not aware of TTL using a fixed one but might come from config as well
 	key := fmt.Sprintf("message:%s", messageID)
 
-	log.Info("caching id: ", messageID)
+	log.Info("caching message id: ", messageID)
 
 	err := p.cache.Set(ctx, key, data, ttl).Err()
 	if err != nil {

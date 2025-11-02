@@ -70,3 +70,8 @@ The Swagger UI will be available at http://localhost:8090
 ### Make run Result
 
 ![Usage](docs/make_run.png)
+
+### Improvements
+- Add config loading based on injected parameters, load secrets in secret :)
+- Add opentelemetry for tracing
+- Integrate monitoring
