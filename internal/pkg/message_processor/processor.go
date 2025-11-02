@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-const contentType = "application/json"
-
 type MessagePayload struct {
 	To      string `json:"to"`
 	Content string `json:"content"`
@@ -57,7 +55,7 @@ func (p *Processor) Send(ctx context.Context, payload MessagePayload) (bool, err
 	if err != nil {
 		return false, fmt.Errorf("failed to send message: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusAccepted {
 		return false, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
