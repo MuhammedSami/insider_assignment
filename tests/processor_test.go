@@ -5,7 +5,7 @@ import (
 	"assignment/internal/app"
 	"assignment/internal/storage"
 	"context"
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -20,6 +20,5 @@ func TestProcessor(t *testing.T) {
 
 	a := app.NewApp(context.Background(), db, cfg)
 
-	fmt.Println(a)
-
+	assert.True(t, a.API.AutoProcessorRunning)
 }
