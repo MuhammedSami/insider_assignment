@@ -1,24 +1,18 @@
 package tests
 
 import (
-	"assignment/config"
 	"assignment/internal/app"
 	"assignment/internal/storage"
 	"context"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestAPIEndpoints(t *testing.T) {
-	cfg, err := config.NewConfig()
-	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
-	}
+	cfg := defaultConfig()
 
-	cfg.DB.Password = "secret"
 	db := storage.NewDb(cfg.DB)
 	a := app.NewApp(context.Background(), db, cfg)
 
