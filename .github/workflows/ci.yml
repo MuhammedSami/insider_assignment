@@ -42,7 +42,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v2.6.0 // latest version
+          version: v2.6.0  # latest version (built with Go 1.25)
           args: run ./...
 
       - name: Run migrations

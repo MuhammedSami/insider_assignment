@@ -1,6 +1,6 @@
 # Message Processor Service
 
-Message Processor Service is a Go-based application that automatically sends messages stored in a PostgreSQL database, supports retrying failed messages, and caches sent messages in Redis. It also provides REST APIs to start/stop the message processor and retrieve sent messages.
+Message Processor Service is a Go-based application that automatically sends messages.
 
 ### Prerequisites
 
