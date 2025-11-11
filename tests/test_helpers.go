@@ -14,6 +14,10 @@ func defaultConfig() *config.Config {
 			BatchProcessCount: 2,
 			RetryFailCount:    2,
 		},
+		WorkerPool: config.WorkerPool{
+			Size:       3,
+			BufferSize: 10,
+		},
 		DB: config.DBConn{
 			Host:     "localhost",
 			User:     "appuser",

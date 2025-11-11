@@ -10,16 +10,19 @@ type WorkerPool struct {
 	wg         sync.WaitGroup
 	workerSize int
 	tasks      chan func()
+	cfg        config.WorkerPool
 }
 
 func NewWorkerPool(workerPoolCfg config.WorkerPool) *WorkerPool {
 	return &WorkerPool{
 		workerSize: workerPoolCfg.Size,
-		tasks:      make(chan func(), workerPoolCfg.BufferSize),
+		cfg:        workerPoolCfg,
 	}
 }
 
 func (w *WorkerPool) StartWorkers() {
+	w.tasks = make(chan func(), w.cfg.BufferSize)
+
 	w.wg.Add(w.workerSize)
 
 	for i := 0; i < w.workerSize; i++ {

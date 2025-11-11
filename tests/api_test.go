@@ -24,18 +24,23 @@ func TestAPIEndpoints(t *testing.T) {
 		method         string
 		endpoint       string
 		expectedStatus int
+		checks         func()
 	}{
 		{
 			name:           "Get sent messages",
 			method:         http.MethodGet,
 			endpoint:       "/messages/sent",
 			expectedStatus: http.StatusOK,
+			checks:         func() {},
 		},
 		{
 			name:           "Stop processor",
 			method:         http.MethodPost,
 			endpoint:       "/processor/stop",
 			expectedStatus: http.StatusOK,
+			checks: func() {
+				assert.Equal(t, false, a.API.AutoProcessorRunning)
+			},
 		},
 		{
 			name:           "Start processor",
@@ -81,6 +86,10 @@ func TestAPIEndpoints(t *testing.T) {
 			defer resp.Body.Close() //nolint:errcheck
 
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
+
+			if tt.checks != nil {
+				tt.checks()
+			}
 		})
 	}
 }
