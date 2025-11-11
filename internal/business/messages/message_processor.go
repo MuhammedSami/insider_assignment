@@ -125,6 +125,7 @@ func (p *AutoMessageProcessor) processUsingWorkers(ctx context.Context, batchCou
 	}
 }
 
+/*
 // what happens if this pod is at scale and we read from same database ?
 // lets imagine someone entered 10s and 1000 per 10s what happens ?
 // what happens on stop called ? context is cancelled and how about the number of messages retrieved ?
@@ -171,6 +172,7 @@ func (p *AutoMessageProcessor) processInBatch(ctx context.Context, batchCount in
 		log.Info("sent!")
 	}
 }
+*/
 
 func (p *AutoMessageProcessor) cacheMessageInfo(ctx context.Context, messageID string) {
 	cacheData := MessageCache{

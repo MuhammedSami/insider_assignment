@@ -22,7 +22,7 @@ func TestProcessor(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusAccepted)
-		w.Write([]byte(`{"sent": true}`))
+		w.Write([]byte(`{"sent": true}`)) //nolint:errcheck
 	}))
 	defer server.Close()
 
