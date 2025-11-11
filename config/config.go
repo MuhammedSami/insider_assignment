@@ -3,6 +3,8 @@ package config
 import (
 	"flag"
 	"fmt"
+	"gopkg.in/yaml.v3"
+	"os"
 	"time"
 )
 
@@ -36,12 +38,19 @@ type RedisConn struct {
 type API struct {
 	Port int
 }
+
+type WorkerPool struct {
+	Size       int `yaml:"size"`
+	BufferSize int `yaml:"buffer_size"`
+}
+
 type Config struct {
 	Api              API
 	Message          Message
 	DB               DBConn
 	Redis            RedisConn
 	MessageProcessor MessageProcessorAPI
+	WorkerPool       WorkerPool `yaml:"worker_pool"`
 }
 
 // use this if config needs any other validation
@@ -56,7 +65,7 @@ func (c *Config) Validate() error {
 func NewConfig() (*Config, error) {
 	// we could use yaml based default approach and secret manager to load sensible information, but I will use flags for now
 
-	retry := flag.Bool("retry", false, "Enable retry for failed messages")
+	retry := flag.Bool("retry", true, "Enable retry for failed messages")
 	timeout := flag.Duration("timeout", 5*time.Second, "Timeout for each message send attempt")
 	interval := flag.Duration("interval", 2*time.Minute, "Interval between message sends") // put: 30s, 1m, 2m30s
 	dbPassword := flag.String("password", "", "Password for db connection")
@@ -64,6 +73,18 @@ func NewConfig() (*Config, error) {
 	batchProcessCount := flag.Int("message-process-count", 2, "Password for redis db connection")
 
 	flag.Parse()
+
+	data, err := os.ReadFile("config/config.yaml")
+	if err != nil {
+		return nil, fmt.Errorf("failed to load default config")
+	}
+
+	var defaultConfig Config
+
+	err = yaml.Unmarshal(data, &defaultConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshall default config")
+	}
 
 	cfg := Config{
 		Message: Message{
@@ -86,7 +107,10 @@ func NewConfig() (*Config, error) {
 			Password: *redisPassword,
 		},
 		Api: API{
-			Port: 8080,
+			Port: defaultConfig.Api.Port,
+		},
+		WorkerPool: WorkerPool{
+			Size: defaultConfig.WorkerPool.Size,
 		},
 		MessageProcessor: MessageProcessorAPI{
 			Host:  "https://webhook.site",

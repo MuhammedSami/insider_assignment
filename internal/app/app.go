@@ -4,6 +4,7 @@ import (
 	"assignment/config"
 	"assignment/internal/api"
 	"assignment/internal/business/messages"
+	workerPoolPkg "assignment/internal/pkg/worker_pool"
 	"context"
 	"errors"
 	"fmt"
@@ -32,12 +33,14 @@ func NewApp(ctx context.Context, db *gorm.DB, cfg *config.Config) *APP {
 	redisClient := app.GetRedisClient(cfg.Redis)
 
 	ctxWithCancel, cancel := context.WithCancel(ctx)
+	workerPool := workerPoolPkg.NewWorkerPool(cfg.WorkerPool)
 
 	autoMessageProcessor := messages.NewAuthMessageProcessor(
 		cfg,
 		messageRepo,
 		app.GetMessageProcessor(),
 		redisClient,
+		workerPool,
 	)
 
 	app.API = *api.NewManager(

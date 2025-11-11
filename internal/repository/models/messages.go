@@ -12,6 +12,7 @@ const (
 	StatusPending       MessageStatus = "pending"
 	StatusSent          MessageStatus = "sent"
 	StatusFailed        MessageStatus = "failed"
+	StatusProcessing    MessageStatus = "processing"
 	StatusPermanentFail MessageStatus = "permanent_fail"
 )
 

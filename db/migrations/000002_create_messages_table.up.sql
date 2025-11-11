@@ -2,6 +2,7 @@ CREATE TYPE message_status AS ENUM (
     'pending',
     'sent',
     'failed',
+    'processing',
     'permanent_fail' -- this might make sense if retry doesn't work several times
 );
 

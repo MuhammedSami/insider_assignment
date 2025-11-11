@@ -21,12 +21,19 @@ type Processor interface {
 	Send(ctx context.Context, payload messageProcessor.MessagePayload) (bool, error)
 }
 
+type WorkerPoolManager interface {
+	StartWorkers()
+	Submit(task func())
+	Close()
+}
+
 type AutoMessageProcessor struct {
-	repo      repo
-	cache     *redis.Client
-	cfg       *config.Config
-	processor Processor
-	Running   bool
+	repo       repo
+	cache      *redis.Client
+	cfg        *config.Config
+	processor  Processor
+	workerPool WorkerPoolManager
+	Running    bool
 }
 
 func NewAuthMessageProcessor(
@@ -34,12 +41,14 @@ func NewAuthMessageProcessor(
 	messageRepo repo,
 	processor Processor,
 	cache *redis.Client,
+	workerPool WorkerPoolManager,
 ) *AutoMessageProcessor {
 	return &AutoMessageProcessor{
-		repo:      messageRepo,
-		cfg:       cfg,
-		processor: processor,
-		cache:     cache,
+		repo:       messageRepo,
+		cfg:        cfg,
+		processor:  processor,
+		cache:      cache,
+		workerPool: workerPool,
 	}
 }
 
@@ -49,23 +58,71 @@ func (p *AutoMessageProcessor) Process(ctx context.Context) error {
 
 	p.Running = true
 
+	p.workerPool.StartWorkers()
+
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				ticker.Stop()
 				p.Running = false
+				p.workerPool.Close()
 
 				log.Info("Processor stopped")
 				return
 			case t := <-ticker.C:
-				fmt.Println("Processing next batch at :", t)
-				p.processInBatch(ctx, p.cfg.Message.BatchProcessCount)
+				log.Infof("Processing next batch at :%s", t)
+				p.processUsingWorkers(ctx, p.cfg.Message.BatchProcessCount)
+				//p.processInBatch(ctx, p.cfg.Message.BatchProcessCount)
 			}
 		}
 	}()
 
 	return nil
+}
+
+func (p *AutoMessageProcessor) processUsingWorkers(ctx context.Context, batchCount int) {
+	msgs, err := p.repo.GetMessagesByStatusesWithLock(
+		ctx,
+		batchCount,
+	)
+	if err != nil {
+		log.Errorf("failed to fetch pending/failed messages err:%+v", err)
+	}
+
+	for _, msg := range msgs {
+		message := msg
+		p.workerPool.Submit(func() {
+			log.Infof("processing recipient: %s", message.UUID)
+
+			messageId := message.UUID.String()
+			exists, _ := p.cache.Exists(ctx, fmt.Sprintf("message:%s", messageId)).Result()
+			if exists > 0 {
+				log.Infof("message %s already processed, skipping", message.UUID)
+				return
+			}
+
+			sent, err := p.processor.Send(ctx, messageProcessor.MessagePayload{
+				To:      message.RecipientPhoneNumber,
+				Content: message.Content,
+			})
+			if err != nil {
+				log.Errorf("failed to send message to recipient:%s, saving for retry, err: %+v", message.UUID, err)
+				if p.cfg.Message.Retry {
+					p.repo.MessageToRetry(messageId, p.cfg.Message.RetryFailCount)
+				}
+
+				return
+			}
+
+			if sent {
+				p.repo.UpdateStatus(messageId, models.StatusSent)
+				p.cacheMessageInfo(ctx, messageId)
+			}
+
+			log.Info("sent!")
+		})
+	}
 }
 
 // what happens if this pod is at scale and we read from same database ?
